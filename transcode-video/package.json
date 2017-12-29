@@ -1,0 +1,14 @@
+{
+  "name": "transcode-video",
+  "version": "1.0.0",
+  "description": "Transcode Video Function",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-sdk": "latest"
+  },
+  "author": "Peter Sbarski",
+  "license": "BSD-2-Clause"
+}

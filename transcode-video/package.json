@@ -9,6 +9,6 @@
   "dependencies": {
     "aws-sdk": "latest"
   },
-  "author": "Peter Sbarski",
+  "author": "Sergey Kazhura",
   "license": "BSD-2-Clause"
 }

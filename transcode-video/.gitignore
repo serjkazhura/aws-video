@@ -58,5 +58,5 @@ typings/
 .env
 
 #archives
-.zip
+*.zip
 

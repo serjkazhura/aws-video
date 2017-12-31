@@ -26,7 +26,7 @@ function checkFileExtension(extension){
     if (!allowedFiles.includes(extension)){
         throw `Invalid file extension ${extension}`;
     }
-}
+};
 
 function createTranscoderJobParams(event){
     var key = event.Records[0].s3.object.key;

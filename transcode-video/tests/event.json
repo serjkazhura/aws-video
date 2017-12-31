@@ -27,7 +27,7 @@
           "arn":"arn:aws:s3:::serverless-video-upload"
         },
         "object":{
-          "key":"my video.mp4",
+          "key":"1.1 my video.mp4",
           "size":2236480,
           "eTag":"ddb7a52094d2079a27ac44f83ca669e9",
           "sequencer": "005686091F4FFF1565"

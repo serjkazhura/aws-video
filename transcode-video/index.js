@@ -6,6 +6,13 @@ var elasticTranscoder = new AWS.ElasticTranscoder({
     region: 'us-east-1'
 });
 
+function removeExtension(fileName){
+    //we could've gotten all fancy by using node's 'path' module. 
+    //But this is simpler and faster.
+    fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    return fileName;
+};
+
 exports.handler = function(event, context, callback){
     console.log('Welcome');
 
@@ -13,9 +20,10 @@ exports.handler = function(event, context, callback){
 
     //the input file may have spaces so replace them with '+'
     var sourceKey = decodeURIComponent(key.replace(/\+/g, ' '));
-
+   
     //remove the extension
-    var outputKey = sourceKey.split('.')[0];
+    var outputKey = removeExtension(sourceKey);
+    console.log(outputKey);
 
     var params = {
         PipelineId: '1514432685255-6fdbwl',

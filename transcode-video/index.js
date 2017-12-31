@@ -1,5 +1,9 @@
 'use strict';
 
+Array.prototype.includes = function(element){
+    return this.indexOf(element) > -1;
+};
+
 var AWS = require('aws-sdk');
 
 var elasticTranscoder = new AWS.ElasticTranscoder({
@@ -65,8 +69,11 @@ exports.handler = function(event, context, callback){
     try {
         var params = createTranscoderJobParams(event);
 
+        console.log('creating transcoded videos');
+
         elasticTranscoder.createJob(params, function(error, data){
             if (error){
+                console.log(error);
                 callback(error);
             }
         });

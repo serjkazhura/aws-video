@@ -6,26 +6,39 @@ var elasticTranscoder = new AWS.ElasticTranscoder({
     region: 'us-east-1'
 });
 
-function removeExtension(fileName){
+var allowedFiles = ['.mp4', '.avi', '.mov'];
+
+function parseFileName(fileName){
     //we could've gotten all fancy by using node's 'path' module. 
     //But this is simpler and faster.
-    fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-    return fileName;
+    var extensionStart = fileName.lastIndexOf('.');
+
+    var name = fileName.substring(0, extensionStart);
+    var extension = fileName.substring(extensionStart, fileName.length);
+
+    return {
+        name : name,
+        extension : extension
+    };
 };
 
-exports.handler = function(event, context, callback){
-    console.log('Welcome');
+function checkFileExtension(extension){
+    if (!allowedFiles.includes(extension)){
+        throw `Invalid file extension ${extension}`;
+    }
+}
 
+function createTranscoderJobParams(event){
     var key = event.Records[0].s3.object.key;
-
     //the input file may have spaces so replace them with '+'
     var sourceKey = decodeURIComponent(key.replace(/\+/g, ' '));
-   
-    //remove the extension
-    var outputKey = removeExtension(sourceKey);
+
+    var nameParts = parseFileName(sourceKey);
+    checkFileExtension(nameParts.extension);
+    var outputKey = nameParts.name;
     console.log(outputKey);
 
-    var params = {
+    return {
         PipelineId: '1514432685255-6fdbwl',
         Input: {
             Key: sourceKey
@@ -44,10 +57,21 @@ exports.handler = function(event, context, callback){
                 PresetId: '1351620000001-100070' //Web Friendly 720p
             }
         ]};
+};
 
-    elasticTranscoder.createJob(params, function(error, data){
-        if (error){
-            callback(error);
-        }
-    });
+exports.handler = function(event, context, callback){
+    console.log('Welcome');
+
+    try {
+        var params = createTranscoderJobParams(event);
+
+        elasticTranscoder.createJob(params, function(error, data){
+            if (error){
+                callback(error);
+            }
+        });
+    }
+    catch (e) {
+        callback(e);
+    }
 };

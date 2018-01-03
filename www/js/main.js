@@ -1,5 +1,5 @@
 (function(){
 	$(document).ready(function(){
-		userController.init(configConstants);
+		appController.init(configConstants);
 	});
 }());

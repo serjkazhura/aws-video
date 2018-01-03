@@ -1,7 +1,8 @@
 var configConstants = {
 	auth0: {
-		domain: 'AUTH0-DOMAIN',
-		clientId: 'AUTH0-CLIENTID'
+		domain: 'sk-cognito.auth0.com',
+		clientId: 'mf_ZTeLtQMWm5pcmjkbUsMlDH6cLiuuN',
+		redirectUrl: 'http://127.0.0.1:8100'
 	},
   apiBaseUrl: 'https://API-GATEWAY-URL/dev'
 };

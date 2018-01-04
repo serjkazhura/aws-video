@@ -1,10 +1,10 @@
 'use strict';
 
-var jwt = require('jsonwebtoken');
 var request = require('request');
+var jwt = require('jsonwebtoken');
 
 exports.handler = function(event, context, callback) {
-    
+
     if (!event.authToken) {
     	callback('Could not find authToken');
     	return;
@@ -19,25 +19,7 @@ exports.handler = function(event, context, callback) {
     		console.log('Failed jwt verification: ', err, 'auth: ', event.authToken);
     		callback('Authorization Failed');
         } else {
-
-            var body = {
-                'id_token': token
-            };
-
-            var options = {
-                url: 'https://'+ process.env.DOMAIN + '/tokeninfo',
-                method: 'POST',
-                json: true,
-                body: body
-            };
-
-            request(options, function(error, response, body) {
-                if (!error && response.statusCode === 200) {
-                    callback(null, body);
-                } else {
-                    callback(error);
-                }
-            });
+            callback(null, decoded);
     	}
     });
 };

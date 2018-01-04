@@ -5,7 +5,7 @@ var appController = function(){
     var configureAuthenticatedRequests = function() {
         $.ajaxSetup({
             'beforeSend': function(xhr) {
-              xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('userToken'));
+              xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('id_token'));
             }
         });
     };

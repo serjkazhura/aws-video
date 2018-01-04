@@ -4,5 +4,5 @@ var configConstants = {
 		clientId: 'mf_ZTeLtQMWm5pcmjkbUsMlDH6cLiuuN',
 		redirectUrl: 'http://127.0.0.1:8100'
 	},
-  apiBaseUrl: 'https://API-GATEWAY-URL/dev'
+  apiBaseUrl: 'https://p5rvpmvau6.execute-api.us-east-1.amazonaws.com/dev'
 };

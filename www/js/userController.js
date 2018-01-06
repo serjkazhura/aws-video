@@ -1,15 +1,58 @@
-var appController = function(){
+var appController = function() {
 
     var _config;
 
-    var configureAuthenticatedRequests = function() {
-        $.ajaxSetup({
-            'beforeSend': function(xhr) {
-              xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('id_token'));
-              xhr.setRequestHeader('x-ska-access-token', localStorage.getItem('access_token'));
+    var requestServiceWraper = function() {
+
+        var beforeSendTrusted = function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('id_token'));
+            xhr.setRequestHeader('x-ska-access-token', localStorage.getItem('access_token'));
+        };
+
+        var beforeSend3rdParty = function(xhr) {
+            //do nothing
+        };
+
+        var isTrustedUrl = function(url) {
+            if (url.match(`^${_config.apiBaseUrl}`)) {
+                return true;
             }
-        });
-    };
+            return false;
+        };
+
+        var get = function(url, callback) {
+
+            var beforeSend = isTrustedUrl(url) ? beforeSendTrusted : beforeSend3rdParty;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                beforeSend: beforeSend,
+                success: callback
+             });
+        };
+
+        var post = function(url, data, callback) {
+
+            var beforeSend = isTrustedUrl(url) ? beforeSendTrusted : beforeSend3rdParty;
+
+            $.ajax({
+                type:'POST',
+                url:url,
+                dataType: 'json',
+                contentType:"application/json",
+                beforeSend: beforeSend,
+                data:JSON.stringify(data),
+                success: callback
+            });
+        };
+
+        return {
+            get: get,
+            post: post
+        }
+    }();
+
 
     var authController = function(){
 
@@ -54,7 +97,6 @@ var appController = function(){
         };
 
         var getUser = function(idToken){
-            configureAuthenticatedRequests();
             _webAuth.client.userInfo(idToken, _getUserEventHandler);
         };
 
@@ -146,10 +188,10 @@ var appController = function(){
             uiElements.profileButton.click(function(e) {
                 var url = _config.apiBaseUrl + '/user-profile';
           
-                $.get(url, function(data, status) {
+                requestServiceWraper.get(url, function(data, status) {
                   $('#user-profile-raw-json').text(JSON.stringify(data, null, 2));
                   $('#user-profile-modal').modal();
-                })
+                });
             });
 
             uiElements.updateUserProfileButton.click(function(e){
@@ -164,15 +206,8 @@ var appController = function(){
                     email: uiElements.userEmailAddress.val() || ''
                 };
 
-                $.ajax({
-                    type:'POST',
-                    url:url,
-                    dataType: 'json',
-                    contentType:"application/json",
-                    data:JSON.stringify(data),
-                    success: function(i){
-                        alert( "user profile is updated successfully");
-                    }
+                requestServiceWraper.post(url, data, function(i){
+                    alert( "user profile is updated successfully");
                 });
             });
         };

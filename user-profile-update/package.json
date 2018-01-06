@@ -1,16 +1,14 @@
 {
-  "name": "user-profile",
+  "name": "user-profile-update",
   "version": "1.0.0",
-  "description": "This Lambda function returns the current user-profile",
+  "description": "This Lambda function upates user profile",
   "main": "index.js",
   "scripts": {
     "test": "run-local-lambda --file index.js --event tests/event.json",
     "deploy": "aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:712095697164:function:user-profile-update --zip-file fileb://Lambda-Deployment.zip",
     "predeploy": "7z a Lambda-Deployment.zip -r -xr!*.zip -xr!*.log"
   },
-  "dependencies": {
-    "request": "^2.69.0"
-  },
+  "dependencies": {},
   "author": "Sergey Kazhura",
   "license": "BSD-2-Clause",
   "devDependencies": {

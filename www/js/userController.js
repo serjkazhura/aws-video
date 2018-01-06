@@ -60,10 +60,12 @@ var appController = function() {
         var _getUserEventHandler;;
 
         var setSession = function(authResult) {
+
             // Set the time that the access token will expire at
             var expiresAt = JSON.stringify(
                 authResult.expiresIn * 1000 + new Date().getTime()
             );
+
             localStorage.setItem('access_token', authResult.accessToken);
             localStorage.setItem('id_token', authResult.idToken);
             localStorage.setItem('expires_at', expiresAt);
@@ -77,12 +79,34 @@ var appController = function() {
             localStorage.removeItem('expires_at');
         };
 
+
+        var isExpired = function() {
+            var isExpired = true;
+            var expiresAt = localStorage.getItem('expires_at');
+
+            if (expiresAt) {
+                var expiresAtTime = parseInt(expiresAt);
+                var currentTime = new Date().getTime();
+
+                if (expiresAtTime > currentTime){
+                    isExpired = false;
+                }
+            }
+
+            return isExpired;
+        };
+
         var handleAuthentication = function() {
+
             var idToken = localStorage.getItem('access_token');
     
             if (idToken) {
-                getUser(idToken);
-                return;
+                if (isExpired()){
+                    clearSession();
+                } else {
+                    getUser(idToken);
+                    return;
+                }
             }
 
             _webAuth.parseHash(function(err, authResult) {

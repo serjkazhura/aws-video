@@ -6,6 +6,7 @@ var appController = function(){
         $.ajaxSetup({
             'beforeSend': function(xhr) {
               xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('id_token'));
+              xhr.setRequestHeader('x-ska-access-token', localStorage.getItem('access_token'));
             }
         });
     };

@@ -1,24 +1,29 @@
 'use strict';
 
 var request = require('request');
-var jwt = require('jsonwebtoken');
 
 exports.handler = function(event, context, callback) {
 
-    if (!event.authToken) {
-    	callback('Could not find authToken');
+    if (!event.accessCode) {
+    	callback('Could not find user access code');
     	return;
     }
 
-    var token = event.authToken.split(' ')[1];
+    var options = {
+        url: `https://${process.env.DOMAIN}/userinfo`,
+        method: 'GET',
+        json: true,
+        headers: {
+            "Authorization" : `Bearer ${event.accessCode}`
+        }
+    };
 
-    var secretBuffer = new Buffer(process.env.AUTH0_SECRET);
-    jwt.verify(token, secretBuffer, function(err, decoded) {
-    	if(err) {
-    		console.log('Failed jwt verification: ', err, 'auth: ', event.authToken);
-    		callback('Authorization Failed');
+    request(options, function(error, response, body){
+        if (!error && response.statusCode === 200) {
+            callback(null, body);
         } else {
-            callback(null, decoded);
-    	}
+            callback(error);
+        }
     });
+
 };

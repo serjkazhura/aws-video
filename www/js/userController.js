@@ -88,6 +88,7 @@ var appController = function(){
         var uiElements = {
             loginButton: null,
             logoutButton: null,
+            updateUserProfileButton: null,
             profileButton: null,
             profileNameLabel: null,
             profileImage: null
@@ -116,6 +117,7 @@ var appController = function(){
             uiElements.profileButton = $('#user-profile');
             uiElements.profileNameLabel = $('#profilename');
             uiElements.profileImage = $('#profilepicture');
+            uiElements.updateUserProfileButton = $('#user-profile-update');
         };
 
         var wireEvents = function(){
@@ -142,7 +144,29 @@ var appController = function(){
                   $('#user-profile-raw-json').text(JSON.stringify(data, null, 2));
                   $('#user-profile-modal').modal();
                 })
-              });
+            });
+
+            uiElements.updateUserProfileButton.click(function(e){
+                e.preventDefault;
+
+                var url = _config.apiBaseUrl + '/user-profile';
+                var data = {
+                    name: 'Tomas',
+                    nickname: 'Smart Pet',
+                    email: 'smart-per@pets.org'
+                };
+
+                $.ajax({
+                    type:'POST',
+                    url:url,
+                    dataType: 'json',
+                    contentType:"application/json",
+                    data:JSON.stringify(data),
+                    success: function(i){
+                        alert( "user profile is updated successfully");
+                    }
+                });
+            });
         };
 
         var init = function() {

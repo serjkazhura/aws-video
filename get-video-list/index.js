@@ -11,7 +11,7 @@ function createBucketParams(next) {
         EncodingType: 'url'
     };
     next(null, params);
-};
+}
 
 function getVideosFromBucket(params, next) {
     s3.listObjects(params, function(err, data){
@@ -21,7 +21,7 @@ function getVideosFromBucket(params, next) {
             next(null, data);
         }
     });
-};
+}
 
 function createList(data, next) {
     var urls = [];
@@ -40,7 +40,7 @@ function createList(data, next) {
     };
 
     next(null, result);
-};
+}
 
 exports.handler = function(event, context, callback) {
     async.waterfall([createBucketParams, getVideosFromBucket, createList], 

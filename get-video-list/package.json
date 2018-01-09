@@ -18,6 +18,10 @@
   "author": "Sergey Kazhura",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "run-local-lambda": "^1.1.0"
+    "chai": "^4.1.2",
+    "rewire": "^3.0.2",
+    "run-local-lambda": "^1.1.0",
+    "sinon": "^4.1.4",
+    "sinon-chai": "^2.14.0"
   }
 }

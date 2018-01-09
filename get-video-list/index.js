@@ -44,11 +44,11 @@ function createList(data, next) {
 
 exports.handler = function(event, context, callback) {
     async.waterfall([createBucketParams, getVideosFromBucket, createList], 
-        function (err, result) {
-            if (err) {
-                callback(err);
-            } else {
-                callback(null, result);
-            }
-        });
+    function (err, result) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, result);
+        }
+    });
 };

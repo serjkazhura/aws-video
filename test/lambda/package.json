@@ -1,0 +1,23 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "tests for limbda functions",
+  "main": "get-video-list-test.js",
+  "scripts": {
+    "test" : "mocha *.js"
+  },
+  "dependencies": {
+    "async": "^2.0.0",
+    "aws-sdk": "^2.3.2",
+    "log": "^1.4.0"
+  },
+  "author": "Sergey Kazhura",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "rewire": "^3.0.2",
+    "run-local-lambda": "^1.1.0",
+    "sinon": "^4.1.4",
+    "sinon-chai": "^2.14.0"
+  }
+}

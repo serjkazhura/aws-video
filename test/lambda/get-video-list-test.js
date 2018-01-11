@@ -25,7 +25,7 @@ var env = {
 };
 
 function getModule(listObjects) {
-    var rewired = rewire('../index.js');
+    var rewired = rewire('../../src/lambda/get-video-list/index.js');
     rewired.__set__({
         's3': { listObjects: listObjects }
     });
@@ -35,8 +35,8 @@ function getModule(listObjects) {
     return rewired;
 }
 
-describe('LambdaFunction', function() {
-  var listObjectsStub, callbackSpy, module;
+describe('get-video-list', function() {
+    var listObjectsStub, callbackSpy, module;
 
     describe('#execute', function() {
         before(function(done) {

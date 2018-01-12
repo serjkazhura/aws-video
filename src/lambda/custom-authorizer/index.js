@@ -1,23 +1,24 @@
 'use strict';
 
 var jwt = require('jsonwebtoken');
+var AuthPolicy = require("aws-auth-policy");
 
-var generatePolicy = function(principalId, effect, event) {
-    var authResponse = {};
-    authResponse.principalId = principalId;
-    var resource = event.methodArn;
-    if (effect && resource) {
-        var policyDocument = {};
-        policyDocument.Version = '2012-10-17'; // default version
-        policyDocument.Statement = [];
-        var statementOne = {};
-        statementOne.Action = 'execute-api:Invoke'; // default action
-        statementOne.Effect = effect;
-        statementOne.Resource = resource;
-        policyDocument.Statement[0] = statementOne;
-        authResponse.policyDocument = policyDocument;
-    }
-    return authResponse;
+var generatePolicy = function(event) {
+
+    // parse the ARN from the incoming event
+    var tmp = event.methodArn.split(':');
+    var apiGatewayArnTmp = tmp[5].split('/');
+    var awsAccountId = tmp[4];
+
+    var apiOptions = {};
+    apiOptions.region = tmp[3];
+    apiOptions.restApiId = apiGatewayArnTmp[0];
+    apiOptions.stage = apiGatewayArnTmp[1];
+    
+    var policy = new AuthPolicy('user', awsAccountId, apiOptions);
+    policy.allowAllMethods();
+
+    return policy.build();
 };
 
 exports.handler = function(event, context, callback){
@@ -34,7 +35,7 @@ exports.handler = function(event, context, callback){
     		console.log('Failed jwt verification: ', err, 'auth: ', event.authorizationToken);
     		callback('Authorization Failed');
     	} else {
-    		callback(null, generatePolicy('user', 'allow', event));
+    		callback(null, generatePolicy(event));
     	}
     });
 };

@@ -9,6 +9,7 @@
     "predeploy": "7z a Lambda-Deployment.zip -r -xr!*.zip -xr!*.log"
   },
   "dependencies": {
+    "aws-auth-policy": "^0.1.0",
     "jsonwebtoken": "^5.7.0"
   },
   "author": "Sergey Kazhura",

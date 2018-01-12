@@ -64,8 +64,6 @@ function createTranscoderJobParams(event){
 };
 
 exports.handler = function(event, context, callback){
-    console.log('Welcome');
-
     try {
         var params = createTranscoderJobParams(event);
 
@@ -75,6 +73,8 @@ exports.handler = function(event, context, callback){
             if (error){
                 console.log(error);
                 callback(error);
+            } else {
+                callback(null, data);
             }
         });
     }

@@ -10,10 +10,14 @@ var sampleData = {
     Contents: [
         {
             Key: 'file1.mp4',
+            ETag: '1234',
+            Size: '12',
             bucket: 'my-bucket'
         },
         {
             Key: 'file2.mp4',
+            ETag: '4321',
+            Size: '21',
             bucket: 'my-bucket'
         }
     ]
@@ -46,10 +50,14 @@ describe('get-video-list', function() {
             var callback = function(error, result) {
                 callbackSpy.apply(null, arguments);
                 done();
-            }
+            };
+
+            var event = {
+
+            };
 
             module = getModule(listObjectsStub);
-            module.handler(null, null, callback);
+            module.handler(event, null, callback);
         });
 
         it('should run our function once', function() {
@@ -62,17 +70,19 @@ describe('get-video-list', function() {
                 "bucket": env.BUCKET,
                 "urls": [
                     {
-                        "Key": sampleData.Contents[0].Key,
-                        "bucket": sampleData.Contents[0].bucket
+                        "filename": sampleData.Contents[0].Key,
+                        "eTag": sampleData.Contents[0].ETag,
+                        "size": sampleData.Contents[0].Size
                     },
                     {
-                        "Key": sampleData.Contents[1].Key,
-                        "bucket": sampleData.Contents[1].bucket
+                        "filename": sampleData.Contents[1].Key,
+                        "eTag": sampleData.Contents[1].ETag,
+                        "size": sampleData.Contents[1].Size
                     }
                 ]
             };
 
-            assert.deepEqual(callbackSpy.args, [[null, result]]);
+            assert.deepEqual(callbackSpy.args[0][1].body, JSON.stringify(result));
         });
     });
 });

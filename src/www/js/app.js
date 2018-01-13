@@ -4,25 +4,36 @@ var appController = function() {
 
     var requestServiceWraper = function() {
 
-        var beforeSendTrusted = function(xhr) {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('id_token'));
-            xhr.setRequestHeader('x-ska-access-token', localStorage.getItem('access_token'));
-        };
+        var beforeSendFactory = function(url, headers) {
 
-        var beforeSend3rdParty = function(xhr) {
-            //do nothing
-        };
+            var isTrustedUrl = function(url) {
+                if (url.match(`^${_config.apiBaseUrl}`)) {
+                    return true;
+                }
+                return false;
+            };
 
-        var isTrustedUrl = function(url) {
-            if (url.match(`^${_config.apiBaseUrl}`)) {
-                return true;
+            var beforeSend = function(xhr){
+                if (isTrustedUrl(url)) {
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('id_token'));
+                }
+
+                if (headers) {
+                    for (var i = 0; i < headers.length; i++) {
+                        var header = headers[i];
+                        xhr.setRequestHeader(header.key, header.value);
+                    }
+                }
+            };
+            
+            return {
+                beforeSend: beforeSend
             }
-            return false;
         };
 
-        var get = function(url, callback) {
+        var get = function(url, headers, callback) {
 
-            var beforeSend = isTrustedUrl(url) ? beforeSendTrusted : beforeSend3rdParty;
+            var beforeSend = beforeSendFactory(url, headers).beforeSend;
 
             $.ajax({
                 url: url,
@@ -32,9 +43,9 @@ var appController = function() {
              });
         };
 
-        var post = function(url, data, callback) {
+        var post = function(url, headers, data, callback) {
 
-            var beforeSend = isTrustedUrl(url) ? beforeSendTrusted : beforeSend3rdParty;
+            var beforeSend = beforeSendFactory(url, headers).beforeSend;
 
             $.ajax({
                 type:'POST',
@@ -54,7 +65,7 @@ var appController = function() {
     }();
 
 
-    var authController = function(){
+    var authController = function() {
 
         var _webAuth;
         var _getUserEventHandler;;
@@ -211,8 +222,12 @@ var appController = function() {
     
             uiElements.profileButton.click(function(e) {
                 var url = _config.apiBaseUrl + '/user-profile';
-          
-                requestServiceWraper.get(url, function(data, status) {
+                var headers = [{
+                    'key': 'x-ska-access-token',
+                    'value' : localStorage.getItem('access_token')
+                }];
+
+                requestServiceWraper.get(url, headers, function(data, status) {
                   $('#user-profile-raw-json').text(JSON.stringify(data, null, 2));
                   $('#user-profile-modal').modal();
                 });
@@ -230,7 +245,12 @@ var appController = function() {
                     email: uiElements.userEmailAddress.val() || ''
                 };
 
-                requestServiceWraper.post(url, data, function(i){
+                var headers = [{
+                    'key': 'x-ska-access-token',
+                    'value' : localStorage.getItem('access_token')
+                }];
+
+                requestServiceWraper.post(url, headers, data, function(i) {
                     alert( "user profile is updated successfully");
                 });
             });
@@ -247,9 +267,53 @@ var appController = function() {
         };
     }();
 
+    var videoController = function(){
+
+        var uiElements = {
+            videoCardTemplate: null,
+            videoList: null,
+            loadingIndicator: null
+        };
+
+        var updateVideoFrontpage = function(data) {
+            var baseUrl = data.baseUrl;
+            var bucket = data.bucket;
+    
+            for (var i = 0; i < data.urls.length; i++) {
+                var video = data.urls[i];
+
+                var clone = uiElements.videoCardTemplate.clone().attr('id', 'video-' + i);
+                clone.find('source').attr('src', baseUrl + '/' + bucket + '/' + video.filename);
+
+                uiElements.videoList.prepend(clone);
+            }
+        };
+
+        var getVideoList = function() {
+            var url = _config.apiBaseUrl + '/videos?encoding=' + encodeURIComponent('720p');
+    
+            requestServiceWraper.get(url, null, function(data, status) {
+                updateVideoFrontpage(data);
+            });
+        };
+
+        var init = function() {
+            uiElements.videoCardTemplate = $('#video-template');
+            uiElements.videoList = $('#video-list');
+    
+            getVideoList();
+        };
+
+        return {
+            init: init
+        };
+        
+    }();
+
     var init = function(cfg){
         _config = cfg;
         userController.init();
+        videoController.init();
     }
 
     return {

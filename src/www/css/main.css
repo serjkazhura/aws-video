@@ -15,3 +15,21 @@
 	height: 20px;
 	width: 20px;
 }
+
+#video-list-container {
+	text-align: center;
+	padding: 30px 0 30px;
+}
+
+#video-template {
+	display: none;
+}
+
+.video-card {
+	background-color: #000;
+	padding: 20px 10px 20px 10px;
+	box-shadow: #111 1px 1px 10px;
+	margin-bottom: 30px;
+	height: 320px;
+	cursor: pointer;
+}

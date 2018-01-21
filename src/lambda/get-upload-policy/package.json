@@ -1,7 +1,7 @@
 {
     "name": "get-upload-policy",
     "version": "1.0.0",
-    "description": "This Lambda function will change a video name in a given s3 bucket",
+    "description": "This Lambda will get an upload policy for a user",
     "main": "index.js",
     "scripts": {
         "create": "aws lambda create-function --function-name get-upload-policy  --handler index.handler --memory-size 128 --runtime nodejs4.3 --role arn:aws:iam::712095697164:role/lambda-s3-execution-role --timeout 3 --publish --zip-file fileb://Lambda-Deployment.zip",

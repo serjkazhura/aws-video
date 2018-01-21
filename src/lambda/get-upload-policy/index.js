@@ -30,6 +30,7 @@ function base64encode (value) {
     return new Buffer(value).toString('base64');
 }
 
+//policy will expire in 1 day
 function generateExpirationDate() {
     var currentDate = new Date();
     currentDate = currentDate.setDate(currentDate.getDate() + 1);
@@ -37,6 +38,7 @@ function generateExpirationDate() {
 }
 
 function generatePolicyDocument(filename, next) {
+    //adding random directory prefix to avoid filename clashes
     var directory = crypto.randomBytes(20).toString('hex');
     var key = directory + '/' + filename;
     var expiration = generateExpirationDate();
@@ -61,6 +63,8 @@ function encode(key, policy, next) {
 }
 
 function sign(key, policy, encoding, next) {
+    
+    //create a signature using user's (IAM user with permission to uplaod a file to s3) private key
     var signature = crypto.createHmac('sha1', process.env.SECRET_ACCESS_KEY).update(encoding).digest('base64');
 
     next(null, key, policy, encoding, signature);

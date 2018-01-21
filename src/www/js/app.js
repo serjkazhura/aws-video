@@ -171,7 +171,8 @@ var appController = function() {
             userLastName: null,
             profileButton: null,
             profileNameLabel: null,
-            profileImage: null
+            profileImage: null,
+            uploadButton: null
         };
         
         var showUserAuthenticationDetails = function(err, profile) {
@@ -184,6 +185,7 @@ var appController = function() {
             if (showAuthenticationElements) {
                 uiElements.profileNameLabel.text(profile.nickname);
                 uiElements.profileImage.attr('src', profile.picture);
+                uiElements.uploadButton.css('display', 'inline-block');
             }
         
             uiElements.loginButton.toggle(!showAuthenticationElements);
@@ -201,6 +203,7 @@ var appController = function() {
             uiElements.userEmailAddress = $('#user-email-address');
             uiElements.userFirstName = $('#user-first-name');
             uiElements.userLastName = $('#user-last-name');
+            uiElements.uploadButton = $('#upload-video-button');
         };
 
         var wireEvents = function(){
@@ -217,6 +220,7 @@ var appController = function() {
     
                 uiElements.logoutButton.hide();
                 uiElements.profileButton.hide();
+                uiElements.uploadButton.hide();
                 uiElements.loginButton.show();
             });
     
@@ -308,6 +312,86 @@ var appController = function() {
             init: init
         };
         
+    }();
+
+    var uploadController = function() {
+
+        var uiElements = {
+            uploadButton: null,
+            uploadButtonContainer: null,
+            uploadProgressBar: null
+        };
+        
+        var progress = function () {
+            var xhr = $.ajaxSettings.xhr();
+            xhr.upload.onprogress = function (evt) {
+                var percentage = evt.loaded / evt.total * 100;
+                $('#upload-progress').find('.progress-bar').css('width', percentage + '%');
+            };
+            return xhr;
+        };
+
+        //assume that we got an upload policy (data). try to upload the file.
+        var upload = function (file, data) {
+
+            uiElements.uploadButtonContainer.hide();
+            uiElements.uploadProgressBar.show();
+            uiElements.uploadProgressBar.find('.progress-bar').css('width', '0');
+    
+            var fd = new FormData();
+            fd.append('key', data.key)
+            fd.append('acl', 'private');
+            fd.append('Content-Type', file.type);
+            fd.append('AWSAccessKeyId', data.access_key);
+            fd.append('policy', data.encoded_policy)
+            fd.append('signature', data.signature);
+            fd.append('file', file, file.name);
+    
+            $.ajax({
+                url: data.upload_url,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                xhr: progress,
+                beforeSend: function (req) {
+                    req.setRequestHeader('Authorization', '');
+                }
+            }).done(function (response) {
+                uiElements.uploadButtonContainer.show();
+                uiElements.uploadProgressBar.hide();
+                alert('Uploaded Finished');
+            }).fail(function (response) {
+                uiElements.uploadButtonContainer.show();
+                uiElements.uploadProgressBar.hide();
+                alert('Failed to upload');
+            });
+        };
+
+        var wireEvents = function () {
+   
+            uiElements.uploadButton.on('change', function (result) {
+                var file = $('#upload').get(0).files[0];
+                var requestDocumentUrl = _config.apiBaseUrl + '/s3-policy-document?filename=' + encodeURI(file.name);
+                
+                //get upload policy first
+                requestServiceWraper.get(requestDocumentUrl, null, function (data, status) {
+                    upload(file, data)
+                });
+            });
+        };
+
+        var init = function () {
+            uiElements.uploadButton = $('#upload');
+            uiElements.uploadButtonContainer = $('#upload-video-button');
+            uiElements.uploadProgressBar = $('#upload-progress');
+    
+            wireEvents();
+        };
+
+        return {
+            init: init
+        };
     }();
 
     var init = function(cfg){

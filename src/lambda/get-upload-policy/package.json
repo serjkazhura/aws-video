@@ -1,0 +1,19 @@
+{
+    "name": "get-upload-policy",
+    "version": "1.0.0",
+    "description": "This Lambda function will change a video name in a given s3 bucket",
+    "main": "index.js",
+    "scripts": {
+        "create": "aws lambda create-function --function-name get-upload-policy  --handler index.handler --memory-size 128 --runtime nodejs4.3 --role arn:aws:iam::712095697164:role/lambda-s3-execution-role --timeout 3 --publish --zip-file fileb://Lambda-Deployment.zip",
+        "deploy": "aws lambda update-function-code --function-name get-upload-policy --zip-file fileb://Lambda-Deployment.zip",
+        "precreate": "7z a Lambda-Deployment.zip -r -xr!*.zip -xr!*.log",
+        "predeploy": "7z a Lambda-Deployment.zip -r -xr!*.zip -xr!*.log"
+    },
+    "dependencies": {
+        "async": "^2.0.0",
+        "aws-sdk": "latest",
+        "crypto": "0.0.3"
+    },
+    "author": "Sergey Kazhura",
+    "license": "BSD-2-Clause"
+}

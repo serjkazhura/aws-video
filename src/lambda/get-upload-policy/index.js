@@ -7,6 +7,8 @@ var crypto = require('crypto');
 var s3 = new AWS.S3();
 
 function createErrorResponse(code, message) {
+    console.log('error');
+
     var response = {
         'statusCode': code,
         'headers' : {'Access-Control-Allow-Origin' : '*'},
@@ -17,6 +19,8 @@ function createErrorResponse(code, message) {
 }
 
 function createSuccessResponse(message) {
+    console.log('success');
+
     var response = {
         'statusCode': 200,
         'headers' : {'Access-Control-Allow-Origin' : '*'},
@@ -73,12 +77,16 @@ function sign(key, policy, encoding, next) {
 exports.handler = function(event, context, callback){
     var filename = null;
 
+    console.log('starting');
+
     if (event.queryStringParameters && event.queryStringParameters.filename) {
         filename = decodeURIComponent(event.queryStringParameters.filename);
     } else {
         callback(null, createErrorResponse(500, 'Filename must be provided'));
         return;
     }
+
+    console.log('generating policy');
 
     async.waterfall([async.apply(generatePolicyDocument, filename), encode, sign],
         function (err, key, policy, encoding, signature) {

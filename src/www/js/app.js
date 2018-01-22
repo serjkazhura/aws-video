@@ -398,6 +398,7 @@ var appController = function() {
         _config = cfg;
         userController.init();
         videoController.init();
+        uploadController.init();
     }
 
     return {

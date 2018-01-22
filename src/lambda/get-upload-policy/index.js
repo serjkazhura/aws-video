@@ -1,5 +1,10 @@
 'use strict';
 
+Date.prototype.addHours = function(h) {    
+    this.setTime(this.getTime() + (h*60*60*1000)); 
+    return this;   
+}
+
 var AWS = require('aws-sdk');
 var async = require('async');
 var crypto = require('crypto');
@@ -34,10 +39,9 @@ function base64encode (value) {
     return new Buffer(value).toString('base64');
 }
 
-//policy will expire in 1 day
+//policy will expire in 2 hours
 function generateExpirationDate() {
-    var currentDate = new Date();
-    currentDate = currentDate.setDate(currentDate.getDate() + 1);
+    var currentDate = new Date().addHours(2);
     return new Date(currentDate).toISOString();
 }
 

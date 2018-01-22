@@ -287,7 +287,6 @@ var appController = function() {
                 var video = data.urls[i];
 
                 var clone = uiElements.videoCardTemplate.clone().attr('id', 'video-' + i);
-                //clone.find('source').attr('src', baseUrl + '/' + bucket + '/' + video.filename);
                 clone.find('source').attr('src', video.filename);
 
                 uiElements.videoList.prepend(clone);

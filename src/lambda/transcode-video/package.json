@@ -6,10 +6,11 @@
   "scripts": {
     "test": "run-local-lambda --file index.js --event tests/event.json",
     "deploy": "aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:712095697164:function:transcode-video --zip-file fileb://Lambda-Deployment.zip",
-    "predeploy": "7z a Lambda-Deployment.zip *.js package.json -x!*.zip -x!*.lock.json -x!*.log -x!*.gitignore"
+    "predeploy": "7z a Lambda-Deployment.zip -r -xr!*.zip -xr!*.log"
   },
   "dependencies": {
-    "aws-sdk": "latest"
+    "aws-sdk": "latest",
+    "firebase": "^4.9.0"
   },
   "author": "Sergey Kazhura",
   "license": "BSD-2-Clause",

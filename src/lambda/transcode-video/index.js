@@ -49,7 +49,9 @@ function createTranscoderJobParams(event){
     var outputKey = nameParts.name;
     console.log(outputKey);
 
-    return {
+    var uniqueVideoKey = outputKey.split('/')[0];
+
+    var params = {
         PipelineId: process.env.ELASTIC_TRANSCODER_PIPELINE_ID,
         Input: {
             Key: sourceKey
@@ -59,7 +61,13 @@ function createTranscoderJobParams(event){
                 Key: outputKey + '-720p' + '.mp4',
                 PresetId: '1351620000001-000010' //Generic 720p
             }
-        ]};
+        ]
+    };
+
+    return {
+        params: params,
+        uniqueVideoKey: uniqueVideoKey
+    };
 }
 
 function pushVideoEntryToFirebase(key, callback) {
@@ -90,7 +98,7 @@ exports.handler = function(event, context, callback) {
 
         console.log('creating transcoded videos');
 
-        elasticTranscoder.createJob(params, function(error, data){
+        elasticTranscoder.createJob(params.params, function(error, data){
             if (error) {
                 console.log('Error creating elastic transcoder job.');
                 callback(error);
@@ -98,7 +106,7 @@ exports.handler = function(event, context, callback) {
             }
     
             console.log('Elastic transcoder job created successfully');
-            pushVideoEntryToFirebase(uniqueVideoKey, callback);
+            pushVideoEntryToFirebase(params.uniqueVideoKey, callback);
         });
     }
     catch (e) {

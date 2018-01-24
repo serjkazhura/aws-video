@@ -278,34 +278,111 @@ var appController = function() {
             videoList: null,
             loadingIndicator: null
         };
-
-        var updateVideoFrontpage = function(data) {
-            var baseUrl = data.baseUrl;
-            var bucket = data.bucket;
+        
+        var addVideoToScreen = function (videoObjs) {
+   
+            $.each(videoObjs.urls, function(index, video) {
+              var newVideoElement = uiElements.videoCardTemplate.clone().attr('id', video.firebaseId);
     
-            for (var i = 0; i < data.urls.length; i++) {
-                var video = data.urls[i];
+              newVideoElement.click(function() {
+                  // the user has clicked on the video... let's play it, or pause it depending on state
+                  var video = newVideoElement.find('video').get(0);
+    
+                  if (newVideoElement.is('.video-playing')) {
+                      video.pause();
+                      $(video).removeAttr('controls'); // remove controls
+                  }
+                  else {
+                      $(video).attr('controls', ''); // show controls
+                      video.play();
+                  }
+    
+                  newVideoElement.toggleClass('video-playing');
+              });
+    
+              newVideoElement.find('video').attr('src', video.url);
+              newVideoElement.find('.transcoding-indicator').hide();
+    
+              uiElements.videoList.prepend(newVideoElement);
+            });
+        };
 
-                var clone = uiElements.videoCardTemplate.clone().attr('id', 'video-' + i);
-                clone.find('source').attr('src', video.filename);
-
-                uiElements.videoList.prepend(clone);
+        var updateVideoOnScreen = function(firebaseId, videoObj) {
+            var videoElement = getElementForVideo(firebaseId);
+            if (!videoObj) {
+                return;
+            }
+    
+            if (videoObj.transcoding) {
+                videoElement.find('video').hide();
+                videoElement.find('.transcoding-indicator').show();
+            } else {
+                videoElement.find('video').show();
+                videoElement.find('.transcoding-indicator').hide();
+    
+                getSignedUrls([{firebaseId: firebaseId, key: videoObj.key}], function(videos) {
+                    videoElement.find('video').attr('src', videos[0].url);
+                });
             }
         };
 
-        var getVideoList = function() {
-            var url = _config.apiBaseUrl + '/videos?encoding=' + encodeURIComponent('720p');
+        var getSignedUrls = function(videoObjs, callback) {
+            if (videoObjs) {
+                var objectMap = $.map(videoObjs, function (video, firebaseId) {
+                    return {firebaseId: firebaseId, key: video.key};
+                });
+
+                var getSignedUrl = _config.apiBaseUrl + '/signed-url';
+
+                requestServiceWraper.post(getSignedUrl, null, JSON.stringify(objectMap), function(data, status) {
+                    if (status === 'success') {
+                        callback(data);
+                    }
+                });
+            }
+        };
+        
+        var getElementForVideo = function(videoId) {
+            return $('#' + videoId);
+        };
+
+        var connectToFirebase = function () {
+   
+            firebase.initializeApp(_config.firebase);
     
-            requestServiceWraper.get(url, null, function(data, status) {
-                updateVideoFrontpage(data);
+            var isConnectedRef = firebase.database().ref(".info/connected");
+    
+            var nodeRef = firebase.database().ref();
+            var childRef = firebase.database().ref('videos');
+            //var nodeRef = firebaseRef.child('videos');
+    
+            isConnectedRef.on('value', function(snap) {
+                if (snap.val() === true) {
+                    uiElements.loadingIndicator.hide();
+                }
+            });
+    
+            nodeRef.on('value', function(result) {
+                console.log(result.val());
+            });
+    
+            // fired when a new movie is added to firebase
+            nodeRef.on('child_added', function (childSnapshot) {
+                getSignedUrls(childSnapshot.val(), addVideoToScreen);
+            });
+    
+            // fired when a movie is updated
+            childRef.on('child_changed', function (childSnapshot) {
+                updateVideoOnScreen(childSnapshot.key, childSnapshot.val());
             });
         };
 
         var init = function() {
             uiElements.videoCardTemplate = $('#video-template');
             uiElements.videoList = $('#video-list');
-    
-            getVideoList();
+            uiElements.loadingIndicator = $('#loading-indicator');
+
+            connectToFirebase();
         };
 
         return {

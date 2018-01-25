@@ -334,7 +334,7 @@ var appController = function() {
 
                 var getSignedUrl = _config.apiBaseUrl + '/signed-url';
 
-                requestServiceWraper.post(getSignedUrl, null, JSON.stringify(objectMap), function(data, status) {
+                requestServiceWraper.post(getSignedUrl, null, objectMap, function(data, status) {
                     if (status === 'success') {
                         callback(data);
                     }
